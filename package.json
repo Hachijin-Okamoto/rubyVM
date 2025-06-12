@@ -7,7 +7,8 @@
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint-format": "npm run lint && npm run format",
-    "build": "tsc --noEmit false",
+    "copy": "cp src/modules/ast/ast.json dist/modules/ast",
+    "build": "tsc --noEmit false && npm run copy",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
     "ast": "ruby src/ast/ruby2json.rb src/ast/main.rb > src/ast/ast.json"
@@ -17,6 +18,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
@@ -25,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
     "eslint": "^9.28.0",
+    "eslint-import-resolver-typescript": "^4.4.3",
     "eslint-plugin-import": "^2.31.0",
     "globals": "^16.2.0",
     "prettier": "^3.5.3",

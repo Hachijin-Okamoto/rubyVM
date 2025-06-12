@@ -21,7 +21,7 @@ interface CallNode {
   type: "call_node";
   receiver: IntegerNode;
   name: string;
-  arguments: ArgumentsNode[];
+  arguments: ArgumentsNode;
 }
 
 interface ArgumentsNode {

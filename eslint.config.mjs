@@ -12,6 +12,11 @@ export default [
       '@typescript-eslint/no-unused-vars': 'warn',
       'import/no-unresolved': 'error',
     },
+    settings: {
+      'import/resolver': {
+        typescript: {},
+      }
+    },
     files: ['**/*.ts', '**/*.tsx'],
   },
 ];
