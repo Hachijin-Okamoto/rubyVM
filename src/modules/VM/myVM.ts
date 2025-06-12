@@ -27,17 +27,21 @@ export class MyVM {
         case OPCODES[ASSEMBLY.DIVISION]:
         case OPCODES[ASSEMBLY.REMAINDER]:
         case OPCODES[ASSEMBLY.POWER]:
+        case OPCODES[ASSEMBLY.GREATER]:
+        case OPCODES[ASSEMBLY.LESS]:
+        case OPCODES[ASSEMBLY.GREATER_EQUAL]:
+        case OPCODES[ASSEMBLY.LESS_EQUAL]:
           const b = this.stack.pop()!;
           const a = this.stack.pop()!;
           this.stack.push(this.calc(a, b, opcode));
           break;
-        
+
         case OPCODES[ASSEMBLY.ASSIGNMENT]:
           const value = this.stack.pop()!;
           const variableId = this.readInt16();
           this.register[variableId] = value!;
           break;
-        
+
         // TODO:ここの変数命名何とかする
         case OPCODES[ASSEMBLY.REFERENCE]:
           const _variableId = this.readInt16();
@@ -77,6 +81,14 @@ export class MyVM {
         return x % y;
       case OPCODES[ASSEMBLY.POWER]:
         return x ** y;
+      case OPCODES[ASSEMBLY.GREATER]:
+        return x > y ? 1 : 0;
+      case OPCODES[ASSEMBLY.LESS]:
+        return x < y ? 1 : 0;
+      case OPCODES[ASSEMBLY.GREATER_EQUAL]:
+        return x >= y ? 1 : 0;
+      case OPCODES[ASSEMBLY.LESS_EQUAL]:
+        return x <= y ? 1 : 0;
       default:
         throw new Error(`Unkown opcode:${opcode}`);
     }

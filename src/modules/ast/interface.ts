@@ -7,11 +7,12 @@ export type Node =
   | ArgumentsNode
   | IntegerNode
   | LocalVariableWriteNode
-  | LocalVariableReadNode;
+  | LocalVariableReadNode
+  | IfNode;
 
 interface ProgramNode {
   type: "program_node";
-  locals: string[];
+  locals?: string[];
   statements: StatementsNode;
 }
 
@@ -38,14 +39,20 @@ interface IntegerNode {
 }
 
 interface LocalVariableWriteNode {
-  type: "local_variable_write_node",
+  type: "local_variable_write_node";
   name: string;
   depth?: number;
   value: Node;
 }
 
 interface LocalVariableReadNode {
-  type: "local_variable_read_node",
+  type: "local_variable_read_node";
   name: string;
   depth?: number;
+}
+
+interface IfNode {
+  type: "if_node";
+  predicate: Node;
+  statements: StatementsNode;
 }

@@ -7,6 +7,12 @@ export const ASSEMBLY = {
   REMAINDER: "REM",
   POWER: "POW",
 
+  // 比較演算
+  GREATER: "GT",
+  LESS: "LT",
+  GREATER_EQUAL: "GTE",
+  LESS_EQUAL: "LTE",
+
   // 変数
   ASSIGNMENT: "STORE",
   REFERENCE: "LOAD",

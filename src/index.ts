@@ -33,6 +33,14 @@ function generateAssembly(node: Node): string[] {
           return [...receiverCode, ...argsCode, ASSEMBLY.REMAINDER];
         case "**":
           return [...receiverCode, ...argsCode, ASSEMBLY.POWER];
+        case ">":
+          return [...receiverCode, ...argsCode, ASSEMBLY.GREATER];
+        case "<":
+          return [...receiverCode, ...argsCode, ASSEMBLY.LESS];
+        case ">=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.GREATER_EQUAL];
+        case "<=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.LESS_EQUAL];
         case "puts":
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":
@@ -63,7 +71,7 @@ function generateAssembly(node: Node): string[] {
 const variableTable: Map<string, number> = new Map<string, number>();
 let variableId = 0;
 function getVariableId(name: string): number {
-  if(!variableTable.has(name)) {
+  if (!variableTable.has(name)) {
     variableTable.set(name, variableId++);
   }
   return variableTable.get(name)!;
@@ -86,11 +94,10 @@ function assemble(assemblyLines: string[]): Uint8Array {
 
     // TODO:ここもうちょっときれいにする
     for (const arg of args) {
-      let num:number;
+      let num: number;
       if (!Number.isNaN(Number(arg))) {
-          num = Number(arg);
-      }
-      else {
+        num = Number(arg);
+      } else {
         num = getVariableId(arg);
       }
 
