@@ -1,3 +1,5 @@
+import { ASSEMBLY } from "../../constants";
+import { OPCODES } from "./constants";
 export class MyVM {
   pc = 0;
   stack: number[] = [];
@@ -12,22 +14,22 @@ export class MyVM {
       const opcode = this.code[this.pc++];
 
       switch (opcode) {
-        case 0x01:
+        case OPCODES[ASSEMBLY.NUMBER]:
           const val = this.readInt16();
           this.stack.push(val);
           break;
 
-        case 0x02: // ADD
+        case OPCODES[ASSEMBLY.ADDITION]: // ADD
           const b = this.stack.pop()!;
           const a = this.stack.pop()!;
           this.stack.push(a + b);
           break;
 
-        case 0x03: // PRINT
+        case OPCODES[ASSEMBLY.OUTPUT]: // PRINT
           console.log(this.stack.pop());
           break;
 
-        case 0xff: // HALT
+        case OPCODES[ASSEMBLY.END]: // HALT
           return;
 
         default:

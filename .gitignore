@@ -1,3 +1,4 @@
 node_modules/
 dist/
-src/ast/ast.json
+src/modules/ast/ast.json
+src/modules/ast/main.rb

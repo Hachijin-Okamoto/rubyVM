@@ -2,6 +2,8 @@ import fs from "fs";
 import { Node } from "./modules/ast/interface";
 import path from "path";
 import { MyVM } from "./modules/VM/myVM";
+import { ASSEMBLY } from "./constants";
+import { OPCODES } from "./modules/VM/constants";
 
 function generateAssembly(node: Node): string[] {
   switch (node.type) {
@@ -12,18 +14,25 @@ function generateAssembly(node: Node): string[] {
       return node.body.flatMap(generateAssembly);
 
     case "integer_node":
-      return [`PUSH ${node.value}`];
+      return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {
       const receiverCode = node.receiver ? generateAssembly(node.receiver) : [];
       const argsCode = node.arguments.arguments.flatMap(generateAssembly);
 
-      if (node.name === "+") {
-        return [...receiverCode, ...argsCode, "ADD"];
-      } else if (node.name === "puts") {
-        return [...argsCode, "PUTS"];
-      } else {
-        return [...receiverCode, ...argsCode, `CALL ${node.name}`];
+      switch (node.name) {
+        case "+":
+          return [...receiverCode, ...argsCode, ASSEMBLY.ADDITION];
+        case "puts":
+          return [...argsCode, ASSEMBLY.OUTPUT];
+        case "print":
+          return [...argsCode, ASSEMBLY.OUTPUT];
+        default:
+          return [
+            ...receiverCode,
+            ...argsCode,
+            ASSEMBLY.FUNCTION_CALL + ` ${node.name}`,
+          ];
       }
     }
 
@@ -34,14 +43,6 @@ function generateAssembly(node: Node): string[] {
       throw new Error("Unknown node type");
   }
 }
-
-// TODO:ファイル分割
-const OPCODES: Record<string, number> = {
-  PUSH: 0x01,
-  ADD: 0x02,
-  PUTS: 0x03,
-  HALT: 0xff,
-};
 
 function assemble(assemblyLines: string[]): Uint8Array {
   const bytes: number[] = [];
@@ -80,7 +81,7 @@ const assembly: string[] = generateAssembly(ast);
 
 // * アセンブリ風コードを見たいときは以下をコメントから戻す
 
-// console.log(assembly);
+console.log(assembly);
 
 // * ここまで
 
@@ -88,7 +89,7 @@ const bytecode: Uint8Array = assemble(assembly);
 
 // * バイトコードを見たいときは以下をコメントから戻す
 
-// console.log(bytecode);
+console.log(bytecode);
 
 // * ここまで
 
