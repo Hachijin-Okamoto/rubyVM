@@ -23,6 +23,24 @@ function generateAssembly(node: Node): string[] {
       switch (node.name) {
         case "+":
           return [...receiverCode, ...argsCode, ASSEMBLY.ADDITION];
+        case "-":
+          return [...receiverCode, ...argsCode, ASSEMBLY.SUBTRACTION];
+        case "*":
+          return [...receiverCode, ...argsCode, ASSEMBLY.MULTIPLICATION];
+        case "/":
+          return [...receiverCode, ...argsCode, ASSEMBLY.DIVISION];
+        case "%":
+          return [...receiverCode, ...argsCode, ASSEMBLY.REMAINDER];
+        case "**":
+          return [...receiverCode, ...argsCode, ASSEMBLY.POWER];
+        case ">":
+          return [...receiverCode, ...argsCode, ASSEMBLY.GREATER];
+        case "<":
+          return [...receiverCode, ...argsCode, ASSEMBLY.LESS];
+        case ">=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.GREATER_EQUAL];
+        case "<=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.LESS_EQUAL];
         case "puts":
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":
@@ -39,10 +57,27 @@ function generateAssembly(node: Node): string[] {
     case "arguments_node":
       return node.arguments.flatMap(generateAssembly);
 
+    case "local_variable_write_node":
+      const valueCode = generateAssembly(node.value);
+      return [...valueCode, ASSEMBLY.ASSIGNMENT + ` ${node.name}`];
+    case "local_variable_read_node":
+      return [ASSEMBLY.REFERENCE + ` ${node.name}`];
     default:
       throw new Error("Unknown node type");
   }
 }
+
+// * 変数名をバイトコードに相互変換する用
+const variableTable: Map<string, number> = new Map<string, number>();
+let variableId = 0;
+function getVariableId(name: string): number {
+  if (!variableTable.has(name)) {
+    variableTable.set(name, variableId++);
+  }
+  return variableTable.get(name)!;
+}
+
+// * ここまで
 
 function assemble(assemblyLines: string[]): Uint8Array {
   const bytes: number[] = [];
@@ -57,10 +92,13 @@ function assemble(assemblyLines: string[]): Uint8Array {
 
     bytes.push(opcode);
 
+    // TODO:ここもうちょっときれいにする
     for (const arg of args) {
-      const num = Number(arg);
-      if (Number.isNaN(num)) {
-        throw new Error(`Invalid operand: ${arg}`);
+      let num: number;
+      if (!Number.isNaN(Number(arg))) {
+        num = Number(arg);
+      } else {
+        num = getVariableId(arg);
       }
 
       // リトルエンディアン
