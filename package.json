@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "lint-format": "npm run lint && npm run format",
+    "build": "tsc --noEmit false",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "ast": "ruby src/ast/ruby2json.rb src/ast/main.rb > src/ast/ast.json"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +22,12 @@
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "@types/node": "^24.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "eslint": "^9.28.0",
+    "eslint-plugin-import": "^2.31.0",
     "globals": "^16.2.0",
+    "prettier": "^3.5.3",
     "typescript-eslint": "^8.34.0"
   }
 }

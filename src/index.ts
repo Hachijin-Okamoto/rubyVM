@@ -1,4 +1,3 @@
 import fs from "fs";
 
-const ast_data: String = fs.readFileSync("./ast.json", "utf-8");
-
+const ast_data: string = fs.readFileSync("./ast.json", "utf-8");
