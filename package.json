@@ -8,10 +8,10 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint-format": "npm run lint && npm run format",
     "copy": "cp src/modules/ast/ast.json dist/modules/ast",
-    "build": "tsc --noEmit false && npm run copy",
+    "build": "npm run ast && tsc --noEmit false && npm run copy",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "ast": "ruby src/ast/ruby2json.rb src/ast/main.rb > src/ast/ast.json"
+    "ast": "ruby src/modules/ast/ruby2json.rb src/modules/ast/main.rb > src/modules/ast/ast.json"
   },
   "keywords": [],
   "author": "",
