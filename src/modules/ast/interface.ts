@@ -5,10 +5,13 @@ export type Node =
   | StatementsNode
   | CallNode
   | ArgumentsNode
-  | IntegerNode;
+  | IntegerNode
+  | LocalVariableWriteNode
+  | LocalVariableReadNode;
 
 interface ProgramNode {
   type: "program_node";
+  locals: string[];
   statements: StatementsNode;
 }
 
@@ -32,4 +35,17 @@ interface ArgumentsNode {
 interface IntegerNode {
   type: "integer_node";
   value: number;
+}
+
+interface LocalVariableWriteNode {
+  type: "local_variable_write_node",
+  name: string;
+  depth?: number;
+  value: Node;
+}
+
+interface LocalVariableReadNode {
+  type: "local_variable_read_node",
+  name: string;
+  depth?: number;
 }

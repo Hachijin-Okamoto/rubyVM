@@ -7,6 +7,10 @@ export const ASSEMBLY = {
   REMAINDER: "REM",
   POWER: "POW",
 
+  // 変数
+  ASSIGNMENT: "STORE",
+  REFERENCE: "LOAD",
+
   OUTPUT: "PUTS",
   FUNCTION_CALL: "CALL",
   NUMBER: "PUSH",
