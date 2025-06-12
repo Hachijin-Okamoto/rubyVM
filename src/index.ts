@@ -23,6 +23,16 @@ function generateAssembly(node: Node): string[] {
       switch (node.name) {
         case "+":
           return [...receiverCode, ...argsCode, ASSEMBLY.ADDITION];
+        case "-":
+          return [...receiverCode, ...argsCode, ASSEMBLY.SUBTRACTION];
+        case "*":
+          return [...receiverCode, ...argsCode, ASSEMBLY.MULTIPLICATION];
+        case "/":
+          return [...receiverCode, ...argsCode, ASSEMBLY.DIVISION];
+        case "%":
+          return [...receiverCode, ...argsCode, ASSEMBLY.REMAINDER];
+        case "**":
+          return [...receiverCode, ...argsCode, ASSEMBLY.POWER];
         case "puts":
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":

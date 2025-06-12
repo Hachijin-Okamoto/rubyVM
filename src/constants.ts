@@ -1,15 +1,14 @@
 export const ASSEMBLY = {
-  // 加算
+  // 四則演算
   ADDITION: "ADD",
   SUBTRACTION: "SUB",
   MULTIPLICATION: "MUL",
   DIVISION: "DIV",
+  REMAINDER: "REM",
+  POWER: "POW",
 
   OUTPUT: "PUTS",
-
   FUNCTION_CALL: "CALL",
-
   NUMBER: "PUSH",
-
   END: "HALT",
 } as const;
