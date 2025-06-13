@@ -5,6 +5,15 @@ import { MyVM } from "./modules/VM/myVM";
 import { ASSEMBLY } from "./constants";
 import { OPCODES } from "./modules/VM/constants";
 
+// * ジャンプ命令に使用するラベルの作成用
+
+let labelId: number = 0;
+function getNewLabel(): string {
+  return `LABEL_${labelId++}`;
+}
+
+// * ここまで
+
 function generateAssembly(node: Node): string[] {
   switch (node.type) {
     case "program_node":
@@ -60,14 +69,30 @@ function generateAssembly(node: Node): string[] {
     case "local_variable_write_node":
       const valueCode = generateAssembly(node.value);
       return [...valueCode, ASSEMBLY.ASSIGNMENT + ` ${node.name}`];
+
     case "local_variable_read_node":
       return [ASSEMBLY.REFERENCE + ` ${node.name}`];
+
+    case "if_node":
+      const conditionCode = generateAssembly(node.predicate);
+      const bodyCode = generateAssembly(node.statements);
+
+      const endLabel = getNewLabel();
+
+      return [
+        ...conditionCode,
+        ASSEMBLY.JUMP_IF_FALSE + ` ${endLabel}`,
+        ...bodyCode,
+        `${endLabel}:`,
+      ];
+
     default:
       throw new Error("Unknown node type");
   }
 }
 
 // * 変数名をバイトコードに相互変換する用
+
 const variableTable: Map<string, number> = new Map<string, number>();
 let variableId = 0;
 function getVariableId(name: string): number {
@@ -80,9 +105,27 @@ function getVariableId(name: string): number {
 // * ここまで
 
 function assemble(assemblyLines: string[]): Uint8Array {
+  const exceptLabelLines: string[] = [];
+  const labelTable = new Map<string, number>();
+  let labelAddress: number = 0;
+
+  // ラベルの位置を保存
+  for (const line of assemblyLines) {
+    if (line.endsWith(":")) {
+      const label: string = line.slice(0, -1);
+      labelTable.set(label, labelAddress);
+      continue;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [instr, ...args] = line.split(" ");
+    exceptLabelLines.push(line);
+    labelAddress += 1 + args.length * 2;
+  }
+
   const bytes: number[] = [];
 
-  for (const line of assemblyLines) {
+  for (const line of exceptLabelLines) {
     const [instr, ...args] = line.split(" ");
 
     const opcode = OPCODES[instr];
@@ -97,6 +140,8 @@ function assemble(assemblyLines: string[]): Uint8Array {
       let num: number;
       if (!Number.isNaN(Number(arg))) {
         num = Number(arg);
+      } else if (labelTable.has(arg)) {
+        num = labelTable.get(arg)!;
       } else {
         num = getVariableId(arg);
       }

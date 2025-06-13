@@ -17,6 +17,10 @@ export const ASSEMBLY = {
   ASSIGNMENT: "STORE",
   REFERENCE: "LOAD",
 
+  // ジャンプ命令
+  JUMP: "JUMP",
+  JUMP_IF_FALSE: "JIF",
+
   OUTPUT: "PUTS",
   FUNCTION_CALL: "CALL",
   NUMBER: "PUSH",

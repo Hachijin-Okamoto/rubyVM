@@ -42,10 +42,23 @@ export class MyVM {
           this.register[variableId] = value!;
           break;
 
-        // TODO:ここの変数命名何とかする
+        // TODO:ここの変数命名何とかする（上と被り）
         case OPCODES[ASSEMBLY.REFERENCE]:
           const _variableId = this.readInt16();
           this.stack.push(this.register[_variableId]);
+          break;
+
+        case OPCODES[ASSEMBLY.JUMP]:
+          const address = this.readInt16();
+          this.pc = address;
+          break;
+
+        case OPCODES[ASSEMBLY.JUMP_IF_FALSE]:
+          const _address = this.readInt16();
+          const condition = this.stack.pop();
+          if (!condition) {
+            this.pc = _address;
+          }
           break;
 
         case OPCODES[ASSEMBLY.OUTPUT]:
