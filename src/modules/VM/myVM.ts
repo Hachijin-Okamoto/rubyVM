@@ -21,6 +21,15 @@ export class MyVM {
           this.stack.push(val);
           break;
 
+        case OPCODES[ASSEMBLY.STRING]: {
+          const len: number = this.readInt16();
+          const strBytes: Uint8Array = this.code.slice(this.pc, this.pc + len);
+          this.pc += len;
+          const str: string = new TextDecoder().decode(strBytes);
+          (this.stack as (number | string)[]).push(str);
+          break;
+        }
+
         case OPCODES[ASSEMBLY.ADDITION]:
         case OPCODES[ASSEMBLY.SUBTRACTION]:
         case OPCODES[ASSEMBLY.MULTIPLICATION]:

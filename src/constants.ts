@@ -25,6 +25,7 @@ export const ASSEMBLY = {
   // その他
   OUTPUT: "PUTS",
   FUNCTION_CALL: "CALL",
-  NUMBER: "PUSH",
+  NUMBER: "PUSH_NUM",
+  STRING: "PUSH_STR",
   END: "HALT",
 } as const;

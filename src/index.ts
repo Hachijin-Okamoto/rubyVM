@@ -137,6 +137,10 @@ function generateAssembly(node: Node): string[] {
         `${_loopEndLabel}:`,
       ];
 
+    case "string_node":
+      const stringValue: string = node.unescaped;
+      return [ASSEMBLY.STRING + ` ${stringValue}`];
+
     default:
       throw new Error(`Unknown node type:${node.type}`);
   }
@@ -188,6 +192,14 @@ function assemble(assemblyLines: string[]): Uint8Array {
 
     // TODO:ここもうちょっときれいにする
     for (const arg of args) {
+      if (instr === ASSEMBLY.STRING) {
+        const encoded: Uint8Array = new TextEncoder().encode(arg);
+        bytes.push(encoded.length & 0xff);
+        bytes.push((encoded.length >> 8) & 0xff);
+        bytes.push(...encoded);
+        continue;
+      }
+
       let num: number;
       if (!Number.isNaN(Number(arg))) {
         num = Number(arg);
