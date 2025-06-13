@@ -86,8 +86,56 @@ function generateAssembly(node: Node): string[] {
         `${endLabel}:`,
       ];
 
+    case "for_node":
+      const indexName = node.index.name;
+      const indexCode = generateAssembly({
+        type: "local_variable_read_node",
+        name: indexName,
+      });
+      const startCode = generateAssembly(node.collection.left);
+      const endCode = generateAssembly(node.collection.right);
+      const _bodyCode = generateAssembly(node.statements);
+
+      const loopStartLabel = getNewLabel();
+      const loopEndLabel = getNewLabel();
+
+      return [
+        ...startCode,
+        ASSEMBLY.ASSIGNMENT + ` ${indexName}`,
+        `${loopStartLabel}:`,
+        ...indexCode,
+        ...endCode,
+        ASSEMBLY.LESS_EQUAL,
+        ASSEMBLY.JUMP_IF_FALSE + ` ${loopEndLabel}`,
+        ..._bodyCode,
+        ...indexCode,
+        ASSEMBLY.NUMBER + " 1",
+        ASSEMBLY.ADDITION,
+        ASSEMBLY.ASSIGNMENT + ` ${indexName}`,
+        ASSEMBLY.JUMP + ` ${loopStartLabel}`,
+        `${loopEndLabel}:`,
+      ];
+
+    case "range_node":
+      return [];
+
+    case "while_node":
+      const _loopStartLabel = getNewLabel();
+      const _loopEndLabel = getNewLabel();
+      const predicateCode = generateAssembly(node.predicate);
+      const __bodyCode = generateAssembly(node.statements);
+
+      return [
+        `${_loopStartLabel}:`,
+        ...predicateCode,
+        ASSEMBLY.JUMP_IF_FALSE + ` ${_loopEndLabel}`,
+        ...__bodyCode,
+        ASSEMBLY.JUMP + ` ${_loopStartLabel}`,
+        `${_loopEndLabel}:`,
+      ];
+
     default:
-      throw new Error("Unknown node type");
+      throw new Error(`Unknown node type:${node.type}`);
   }
 }
 
@@ -164,7 +212,10 @@ const assembly: string[] = generateAssembly(ast);
 
 // * アセンブリ風コードを見たいときは以下をコメントから戻す
 
-console.log(assembly);
+console.log("<Assembly-like Code>");
+for (const line of assembly) {
+  console.log(line);
+}
 
 // * ここまで
 
@@ -172,9 +223,11 @@ const bytecode: Uint8Array = assemble(assembly);
 
 // * バイトコードを見たいときは以下をコメントから戻す
 
+console.log("<Byte Code>");
 console.log(bytecode);
 
 // * ここまで
 
 const VM: MyVM = new MyVM(bytecode);
+console.log("<Standard Output>");
 VM.run();
