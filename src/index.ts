@@ -26,8 +26,11 @@ function generateAssembly(node: Node): string[] {
       return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {
-      const receiverCode = node.receiver ? generateAssembly(node.receiver) : [];
-      const argsCode = node.arguments.arguments.flatMap(generateAssembly);
+      const receiverCode: string[] = node.receiver
+        ? generateAssembly(node.receiver)
+        : [];
+      const argsCode: string[] =
+        node.arguments.arguments.flatMap(generateAssembly);
 
       switch (node.name) {
         case "+":
@@ -67,17 +70,17 @@ function generateAssembly(node: Node): string[] {
       return node.arguments.flatMap(generateAssembly);
 
     case "local_variable_write_node":
-      const valueCode = generateAssembly(node.value);
+      const valueCode: string[] = generateAssembly(node.value);
       return [...valueCode, ASSEMBLY.ASSIGNMENT + ` ${node.name}`];
 
     case "local_variable_read_node":
       return [ASSEMBLY.REFERENCE + ` ${node.name}`];
 
     case "if_node":
-      const conditionCode = generateAssembly(node.predicate);
-      const bodyCode = generateAssembly(node.statements);
+      const conditionCode: string[] = generateAssembly(node.predicate);
+      const bodyCode: string[] = generateAssembly(node.statements);
 
-      const endLabel = getNewLabel();
+      const endLabel: string = getNewLabel();
 
       return [
         ...conditionCode,
@@ -86,15 +89,63 @@ function generateAssembly(node: Node): string[] {
         `${endLabel}:`,
       ];
 
+    case "for_node":
+      const indexName: string = node.index.name;
+      const indexCode: string[] = generateAssembly({
+        type: "local_variable_read_node",
+        name: indexName,
+      });
+      const startCode: string[] = generateAssembly(node.collection.left);
+      const endCode: string[] = generateAssembly(node.collection.right);
+      const _bodyCode: string[] = generateAssembly(node.statements);
+
+      const loopStartLabel: string = getNewLabel();
+      const loopEndLabel: string = getNewLabel();
+
+      return [
+        ...startCode,
+        ASSEMBLY.ASSIGNMENT + ` ${indexName}`,
+        `${loopStartLabel}:`,
+        ...indexCode,
+        ...endCode,
+        ASSEMBLY.LESS_EQUAL,
+        ASSEMBLY.JUMP_IF_FALSE + ` ${loopEndLabel}`,
+        ..._bodyCode,
+        ...indexCode,
+        ASSEMBLY.NUMBER + " 1",
+        ASSEMBLY.ADDITION,
+        ASSEMBLY.ASSIGNMENT + ` ${indexName}`,
+        ASSEMBLY.JUMP + ` ${loopStartLabel}`,
+        `${loopEndLabel}:`,
+      ];
+
+    case "range_node":
+      return [];
+
+    case "while_node":
+      const _loopStartLabel: string = getNewLabel();
+      const _loopEndLabel: string = getNewLabel();
+      const predicateCode: string[] = generateAssembly(node.predicate);
+      const __bodyCode: string[] = generateAssembly(node.statements);
+
+      return [
+        `${_loopStartLabel}:`,
+        ...predicateCode,
+        ASSEMBLY.JUMP_IF_FALSE + ` ${_loopEndLabel}`,
+        ...__bodyCode,
+        ASSEMBLY.JUMP + ` ${_loopStartLabel}`,
+        `${_loopEndLabel}:`,
+      ];
+
     default:
-      throw new Error("Unknown node type");
+      throw new Error(`Unknown node type:${node.type}`);
   }
 }
 
 // * 変数名をバイトコードに相互変換する用
 
 const variableTable: Map<string, number> = new Map<string, number>();
-let variableId = 0;
+let variableId: number = 0;
 function getVariableId(name: string): number {
   if (!variableTable.has(name)) {
     variableTable.set(name, variableId++);
@@ -106,7 +157,7 @@ function getVariableId(name: string): number {
 
 function assemble(assemblyLines: string[]): Uint8Array {
   const exceptLabelLines: string[] = [];
-  const labelTable = new Map<string, number>();
+  const labelTable: Map<string, number> = new Map<string, number>();
   let labelAddress: number = 0;
 
   // ラベルの位置を保存
@@ -128,7 +179,7 @@ function assemble(assemblyLines: string[]): Uint8Array {
   for (const line of exceptLabelLines) {
     const [instr, ...args] = line.split(" ");
 
-    const opcode = OPCODES[instr];
+    const opcode: number = OPCODES[instr];
     if (opcode === undefined) {
       throw new Error(`Unknown instruction: ${instr}`);
     }
@@ -164,7 +215,10 @@ const assembly: string[] = generateAssembly(ast);
 
 // * アセンブリ風コードを見たいときは以下をコメントから戻す
 
-console.log(assembly);
+console.log("<Assembly-like Code>");
+for (const line of assembly) {
+  console.log(line);
+}
 
 // * ここまで
 
@@ -172,9 +226,11 @@ const bytecode: Uint8Array = assemble(assembly);
 
 // * バイトコードを見たいときは以下をコメントから戻す
 
+console.log("<Byte Code>");
 console.log(bytecode);
 
 // * ここまで
 
 const VM: MyVM = new MyVM(bytecode);
+console.log("<Standard Output>");
 VM.run();

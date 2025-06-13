@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/typedef
 export const ASSEMBLY = {
   // 四則演算
   ADDITION: "ADD",
@@ -21,6 +22,7 @@ export const ASSEMBLY = {
   JUMP: "JUMP",
   JUMP_IF_FALSE: "JIF",
 
+  // その他
   OUTPUT: "PUTS",
   FUNCTION_CALL: "CALL",
   NUMBER: "PUSH",

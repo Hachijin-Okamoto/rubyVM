@@ -11,7 +11,8 @@ export type Node =
   | LocalVariableTargetNode
   | IfNode
   | ForNode
-  | RangeNode;
+  | RangeNode
+  | WhileNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -69,7 +70,7 @@ interface IfNode {
 interface ForNode {
   type: "for_node";
   index: LocalVariableTargetNode;
-  collection: Node;
+  collection: RangeNode;
   statements: StatementsNode;
 }
 
@@ -78,4 +79,11 @@ interface RangeNode {
   flags?: number;
   left: Node;
   right: Node;
+}
+
+interface WhileNode {
+  type: "while_node";
+  flags?: number;
+  predicate: Node;
+  statements: StatementsNode;
 }

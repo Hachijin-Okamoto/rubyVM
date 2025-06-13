@@ -2,7 +2,7 @@ import { ASSEMBLY } from "../../constants";
 import { OPCODES } from "./constants";
 
 export class MyVM {
-  pc = 0;
+  pc: number = 0;
   stack: number[] = [];
   code: Uint8Array;
   register: number[] = [];
@@ -13,11 +13,11 @@ export class MyVM {
 
   run() {
     while (this.pc < this.code.length) {
-      const opcode = this.code[this.pc++];
+      const opcode: number = this.code[this.pc++];
 
       switch (opcode) {
         case OPCODES[ASSEMBLY.NUMBER]:
-          const val = this.readInt16();
+          const val: number = this.readInt16();
           this.stack.push(val);
           break;
 
@@ -31,31 +31,31 @@ export class MyVM {
         case OPCODES[ASSEMBLY.LESS]:
         case OPCODES[ASSEMBLY.GREATER_EQUAL]:
         case OPCODES[ASSEMBLY.LESS_EQUAL]:
-          const b = this.stack.pop()!;
-          const a = this.stack.pop()!;
+          const b: number = this.stack.pop()!;
+          const a: number = this.stack.pop()!;
           this.stack.push(this.calc(a, b, opcode));
           break;
 
         case OPCODES[ASSEMBLY.ASSIGNMENT]:
-          const value = this.stack.pop()!;
-          const variableId = this.readInt16();
+          const value: number = this.stack.pop()!;
+          const variableId: number = this.readInt16();
           this.register[variableId] = value!;
           break;
 
         // TODO:ここの変数命名何とかする（上と被り）
         case OPCODES[ASSEMBLY.REFERENCE]:
-          const _variableId = this.readInt16();
+          const _variableId: number = this.readInt16();
           this.stack.push(this.register[_variableId]);
           break;
 
         case OPCODES[ASSEMBLY.JUMP]:
-          const address = this.readInt16();
+          const address: number = this.readInt16();
           this.pc = address;
           break;
 
         case OPCODES[ASSEMBLY.JUMP_IF_FALSE]:
-          const _address = this.readInt16();
-          const condition = this.stack.pop();
+          const _address: number = this.readInt16();
+          const condition: number = this.stack.pop()!;
           if (!condition) {
             this.pc = _address;
           }
@@ -75,7 +75,7 @@ export class MyVM {
   }
 
   readInt16(): number {
-    const bytes = this.code.slice(this.pc, this.pc + 2);
+    const bytes: Uint8Array = this.code.slice(this.pc, this.pc + 2);
     this.pc += 2;
     return bytes[0] | (bytes[1] << 8);
   }
