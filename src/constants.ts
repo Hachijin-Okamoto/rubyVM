@@ -13,6 +13,8 @@ export const ASSEMBLY = {
   LESS: "LT",
   GREATER_EQUAL: "GTE",
   LESS_EQUAL: "LTE",
+  EQUAL: "EQ",
+  NOT_EQUAL: "NEQ",
 
   // 変数
   ASSIGNMENT: "STORE",

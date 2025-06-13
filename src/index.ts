@@ -26,6 +26,9 @@ function generateAssembly(node: Node): string[] {
       return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {
+      if (node.name === "exit") {
+        return [ASSEMBLY.END];
+      }
       const receiverCode: string[] = node.receiver
         ? generateAssembly(node.receiver)
         : [];
@@ -53,6 +56,10 @@ function generateAssembly(node: Node): string[] {
           return [...receiverCode, ...argsCode, ASSEMBLY.GREATER_EQUAL];
         case "<=":
           return [...receiverCode, ...argsCode, ASSEMBLY.LESS_EQUAL];
+        case "==":
+          return [...receiverCode, ...argsCode, ASSEMBLY.EQUAL];
+        case "!=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.NOT_EQUAL];
         case "puts":
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":

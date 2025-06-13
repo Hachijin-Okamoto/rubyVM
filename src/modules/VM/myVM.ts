@@ -40,6 +40,8 @@ export class MyVM {
         case OPCODES[ASSEMBLY.LESS]:
         case OPCODES[ASSEMBLY.GREATER_EQUAL]:
         case OPCODES[ASSEMBLY.LESS_EQUAL]:
+        case OPCODES[ASSEMBLY.EQUAL]:
+        case OPCODES[ASSEMBLY.NOT_EQUAL]:
           const b: number = this.stack.pop()!;
           const a: number = this.stack.pop()!;
           this.stack.push(this.calc(a, b, opcode));
@@ -111,6 +113,10 @@ export class MyVM {
         return x >= y ? 1 : 0;
       case OPCODES[ASSEMBLY.LESS_EQUAL]:
         return x <= y ? 1 : 0;
+      case OPCODES[ASSEMBLY.EQUAL]:
+        return x == y ? 1 : 0;
+      case OPCODES[ASSEMBLY.NOT_EQUAL]:
+        return x != y ? 1 : 0;
       default:
         throw new Error(`Unkown opcode:${opcode}`);
     }
