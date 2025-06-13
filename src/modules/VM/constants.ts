@@ -13,7 +13,9 @@ export const OPCODES: Record<string, number> = {
   [ASSEMBLY.LESS_EQUAL]: 0x0a,
   [ASSEMBLY.ASSIGNMENT]: 0x0b,
   [ASSEMBLY.REFERENCE]: 0x0c,
-  [ASSEMBLY.NUMBER]: 0x0d,
-  [ASSEMBLY.OUTPUT]: 0x0e,
+  [ASSEMBLY.JUMP]: 0x0d,
+  [ASSEMBLY.JUMP_IF_FALSE]: 0x0e,
+  [ASSEMBLY.NUMBER]: 0x0f,
+  [ASSEMBLY.OUTPUT]: 0x10,
   [ASSEMBLY.END]: 0xff,
 } as const;

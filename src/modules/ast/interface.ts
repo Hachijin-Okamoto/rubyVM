@@ -8,7 +8,10 @@ export type Node =
   | IntegerNode
   | LocalVariableWriteNode
   | LocalVariableReadNode
-  | IfNode;
+  | LocalVariableTargetNode
+  | IfNode
+  | ForNode
+  | RangeNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -51,8 +54,28 @@ interface LocalVariableReadNode {
   depth?: number;
 }
 
+interface LocalVariableTargetNode {
+  type: "local_variable_target_node";
+  name: string;
+  depth?: number;
+}
+
 interface IfNode {
   type: "if_node";
   predicate: Node;
   statements: StatementsNode;
+}
+
+interface ForNode {
+  type: "for_node";
+  index: LocalVariableTargetNode;
+  collection: Node;
+  statements: StatementsNode;
+}
+
+interface RangeNode {
+  type: "range_node";
+  flags?: number;
+  left: Node;
+  right: Node;
 }
