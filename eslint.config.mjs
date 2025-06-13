@@ -11,6 +11,15 @@ export default [
     rules: {
       '@typescript-eslint/no-unused-vars': 'warn',
       'import/no-unresolved': 'error',
+      '@typescript-eslint/typedef': [
+      'warn',
+      {
+        'parameter': true,
+        'propertyDeclaration': true,
+        'variableDeclaration': true,
+        'memberVariableDeclaration': true
+      }
+    ]
     },
     settings: {
       'import/resolver': {
