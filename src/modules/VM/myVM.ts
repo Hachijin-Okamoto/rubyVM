@@ -67,7 +67,7 @@ export class MyVM {
         case OPCODES[ASSEMBLY.JUMP_IF_FALSE]:
           const _address: number = this.readInt16();
           const condition: number = this.stack.pop()!;
-          if (!condition) {
+          if (condition === 0) {
             this.pc = _address;
           }
           break;

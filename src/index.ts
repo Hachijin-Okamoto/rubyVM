@@ -179,10 +179,15 @@ function assemble(assemblyLines: string[]): Uint8Array {
       continue;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [instr, ...args] = line.split(" ");
     exceptLabelLines.push(line);
-    labelAddress += 1 + args.length * 2;
+
+    if (instr === ASSEMBLY.STRING) {
+      const _encoded: Uint8Array = new TextEncoder().encode(args.join(" "));
+      labelAddress += 1 + 2 + _encoded.length;
+    } else {
+      labelAddress += 1 + args.length * 2;
+    }
   }
 
   const bytes: number[] = [];
