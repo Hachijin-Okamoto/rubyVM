@@ -26,6 +26,9 @@ function generateAssembly(node: Node): string[] {
       return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {
+      if (node.name === "exit") {
+        return [ASSEMBLY.END];
+      }
       const receiverCode: string[] = node.receiver
         ? generateAssembly(node.receiver)
         : [];
@@ -53,6 +56,10 @@ function generateAssembly(node: Node): string[] {
           return [...receiverCode, ...argsCode, ASSEMBLY.GREATER_EQUAL];
         case "<=":
           return [...receiverCode, ...argsCode, ASSEMBLY.LESS_EQUAL];
+        case "==":
+          return [...receiverCode, ...argsCode, ASSEMBLY.EQUAL];
+        case "!=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.NOT_EQUAL];
         case "puts":
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":
@@ -172,10 +179,15 @@ function assemble(assemblyLines: string[]): Uint8Array {
       continue;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [instr, ...args] = line.split(" ");
     exceptLabelLines.push(line);
-    labelAddress += 1 + args.length * 2;
+
+    if (instr === ASSEMBLY.STRING) {
+      const _encoded: Uint8Array = new TextEncoder().encode(args.join(" "));
+      labelAddress += 1 + 2 + _encoded.length;
+    } else {
+      labelAddress += 1 + args.length * 2;
+    }
   }
 
   const bytes: number[] = [];

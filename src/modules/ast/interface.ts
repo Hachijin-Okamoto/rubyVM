@@ -13,7 +13,9 @@ export type Node =
   | ForNode
   | RangeNode
   | WhileNode
-  | StringNode;
+  | StringNode
+  | BreakNode
+  | NextNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -93,4 +95,12 @@ interface StringNode {
   type: "string_node";
   flags?: number;
   unescaped: string;
+}
+
+interface BreakNode {
+  type: "break_node";
+}
+
+interface NextNode {
+  type: "next_node";
 }
