@@ -12,7 +12,8 @@ export type Node =
   | IfNode
   | ForNode
   | RangeNode
-  | WhileNode;
+  | WhileNode
+  | StringNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -86,4 +87,10 @@ interface WhileNode {
   flags?: number;
   predicate: Node;
   statements: StatementsNode;
+}
+
+interface StringNode {
+  type: "string_node";
+  flags?: number;
+  unescaped: string;
 }

@@ -16,6 +16,7 @@ export const OPCODES: Record<string, number> = {
   [ASSEMBLY.JUMP]: 0x0d,
   [ASSEMBLY.JUMP_IF_FALSE]: 0x0e,
   [ASSEMBLY.NUMBER]: 0x0f,
-  [ASSEMBLY.OUTPUT]: 0x10,
+  [ASSEMBLY.STRING]: 0x10,
+  [ASSEMBLY.OUTPUT]: 0x11,
   [ASSEMBLY.END]: 0xff,
 } as const;
