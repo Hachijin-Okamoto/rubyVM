@@ -23,6 +23,9 @@ export class MyVM {
     return 0;
   }
 
+  // 実行時間計測
+  instructionTimes: Map<number, bigint> = new Map();
+
   run() {
     while (this.pc < this.code.length) {
       const opcode: number = this.code[this.pc++];
@@ -35,10 +38,22 @@ export class MyVM {
 
       // * ここまで
 
+      // 実行時間計測
+      const instStart: bigint = process.hrtime.bigint();
+
       switch (opcode) {
         case OPCODES[ASSEMBLY.NUMBER]:
           const val: number = this.readInt16();
           this.stack.push(val);
+          break;
+
+        // 高速化用
+        case OPCODES[ASSEMBLY.NUMBER1]:
+          this.stack.push(1);
+          break;
+
+        case OPCODES[ASSEMBLY.NUMBER2]:
+          this.stack.push(2);
           break;
 
         case OPCODES[ASSEMBLY.STRING]: {
@@ -62,9 +77,9 @@ export class MyVM {
         case OPCODES[ASSEMBLY.LESS_EQUAL]:
         case OPCODES[ASSEMBLY.EQUAL]:
         case OPCODES[ASSEMBLY.NOT_EQUAL]:
-          const b: number = this.stack.pop()!;
-          const a: number = this.stack.pop()!;
-          this.stack.push(this.calc(a, b, opcode));
+          const __b: number = this.stack.pop()!;
+          const __a: number = this.stack.pop()!;
+          this.stack.push(this.calc(__a, __b, opcode));
           break;
 
         case OPCODES[ASSEMBLY.ASSIGNMENT]:
@@ -103,6 +118,8 @@ export class MyVM {
         case OPCODES[ASSEMBLY.FUNCTION_CALL]:
           const targetAddress: number = this.readInt16();
           const argsCount: number = this.readInt16();
+
+          /*
           const newEnv: { [key: number]: number } = {};
 
           for (let i: number = 0; i < argsCount; i++) {
@@ -110,6 +127,16 @@ export class MyVM {
           }
 
           this.envStack.push(newEnv);
+          /*/
+          const newEnv: number[] = [];
+
+          for (let i: number = argsCount - 1; i >= 0; i--) {
+            newEnv[i] = this.stack.pop()!;
+          }
+
+          this.envStack.push(newEnv);
+          //*/
+
           this.callStack.push(this.pc);
           this.pc = targetAddress;
           break;
@@ -124,7 +151,24 @@ export class MyVM {
         default:
           throw new Error(`Unknown opcode: ${opcode}`);
       }
+
+      // 実行時間計測
+      const instEnd: bigint = process.hrtime.bigint();
+      const prev: bigint = this.instructionTimes.get(opcode) ?? 0n;
+      this.instructionTimes.set(opcode, prev + (instEnd - instStart));
     }
+
+    console.log("命令別実行時間:");
+    let numTime: number = 0;
+    for (const [opcode, time] of this.instructionTimes.entries()) {
+      const μs: number = Number(time) / 1_000; // ns → μs
+      if (opcode === 20 || opcode === 161 || opcode === 162) {
+        numTime += μs;
+        continue;
+      }
+      console.log(`0x${opcode.toString(16)}: ${μs.toFixed(3)} μs`);
+    }
+    console.log(`PUSH_NUM: ${numTime.toFixed(3)} μs`);
   }
 
   readInt16(): number {

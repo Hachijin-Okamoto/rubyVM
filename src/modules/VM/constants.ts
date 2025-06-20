@@ -24,4 +24,8 @@ export const OPCODES: Record<string, number> = {
   [ASSEMBLY.STRING]: 0x15,
   [ASSEMBLY.OUTPUT]: 0x16,
   [ASSEMBLY.END]: 0xff,
+
+  // 高速化用
+  [ASSEMBLY.NUMBER1]: 0xa1,
+  [ASSEMBLY.NUMBER2]: 0xa2,
 } as const;
