@@ -1,3 +1,8 @@
+/* index.ts */
+
+/**
+ * エントリポイント
+ */
 import fs from "fs";
 import { Node } from "./modules/ast/interface";
 import path from "path";
@@ -13,6 +18,17 @@ function getNewLabel(): string {
 }
 
 // * ここまで
+
+/**
+ * 関数周りに使用するラベルの作成用
+ * @param name 関数名
+ * @returns ラベル（関数名を平文で含む）
+ */
+function getNewFuncLabel(name: string): string {
+  return `LABEL_${name}`;
+}
+
+const functionTable: Map<string, string[]> = new Map<string, string[]>();
 
 function generateAssembly(node: Node): string[] {
   switch (node.type) {
@@ -35,6 +51,15 @@ function generateAssembly(node: Node): string[] {
       const argsCode: string[] =
         node.arguments.arguments.flatMap(generateAssembly);
 
+      if (functionTable.has(node.name)) {
+        const funcInfo: string[] = functionTable.get(node.name)!;
+        const argsCount: number = funcInfo.length;
+        return [
+          ...receiverCode,
+          ...argsCode,
+          `${ASSEMBLY.FUNCTION_CALL} ${node.name} ${argsCount}`,
+        ];
+      }
       switch (node.name) {
         case "+":
           return [...receiverCode, ...argsCode, ASSEMBLY.ADDITION];
@@ -148,9 +173,55 @@ function generateAssembly(node: Node): string[] {
       const stringValue: string = node.unescaped;
       return [ASSEMBLY.STRING + ` ${stringValue}`];
 
+    case "def_node":
+      functionTable.set(
+        node.name,
+        node.parameters.requireds.map((param) => param.name),
+      );
+      const functionDefnitionLabel: string = getNewFuncLabel(node.name);
+      const ___bodyCode: string[] = generateAssembly(node.body);
+      return [`${functionDefnitionLabel}:`, ...___bodyCode]; // 常にreturn文が書かれているという想定
+
+    case "return_node": {
+      const returnValueCode: string[] = generateAssembly(node.arguments);
+      return [...returnValueCode, ASSEMBLY.RETURN];
+    }
     default:
       throw new Error(`Unknown node type:${node.type}`);
   }
+}
+
+/**
+ * generateAssemblyによって生成されたアセンブリ列から、関数内のLOAD命令を削除
+ * @param assembly generateAssemblyによって生成されたアセンブリ列
+ * @returns 関数内のLOAD命令を削除したアセンブリ列
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function postProcessAssembly(assembly: string[]): string[] {
+  const result: string[] = [];
+  let inFunction: boolean = false;
+
+  for (const line of assembly) {
+    if (line.match(/^LABEL_[a-zA-Z]/)) {
+      inFunction = true;
+      result.push(line);
+      continue;
+    }
+
+    if (inFunction && line.startsWith("LOAD ")) {
+      continue;
+    }
+
+    if (inFunction && (line === "RET" || line === "RETURN")) {
+      result.push(line);
+      inFunction = false;
+      continue;
+    }
+
+    result.push(line);
+  }
+
+  return result;
 }
 
 // * 変数名をバイトコードに相互変換する用
@@ -166,6 +237,11 @@ function getVariableId(name: string): number {
 
 // * ここまで
 
+/**
+ *
+ * @param assemblyLines 関数"generateAssembly"によって生成されたアセンブリ風コード
+ * @returns バイトコード列（10進表記）
+ */
 function assemble(assemblyLines: string[]): Uint8Array {
   const exceptLabelLines: string[] = [];
   const labelTable: Map<string, number> = new Map<string, number>();
@@ -204,6 +280,7 @@ function assemble(assemblyLines: string[]): Uint8Array {
 
     // TODO:ここもうちょっときれいにする
     for (const arg of args) {
+      let num: number;
       if (instr === ASSEMBLY.STRING) {
         const encoded: Uint8Array = new TextEncoder().encode(arg);
         bytes.push(encoded.length & 0xff);
@@ -212,8 +289,13 @@ function assemble(assemblyLines: string[]): Uint8Array {
         continue;
       }
 
-      let num: number;
-      if (!Number.isNaN(Number(arg))) {
+      if (instr === ASSEMBLY.FUNCTION_CALL) {
+        if (!Number.isNaN(Number(arg))) {
+          num = Number(arg);
+        } else {
+          num = labelTable.get(`LABEL_${arg}`)!;
+        }
+      } else if (!Number.isNaN(Number(arg))) {
         num = Number(arg);
       } else if (labelTable.has(arg)) {
         num = labelTable.get(arg)!;

@@ -2,18 +2,38 @@ import { ASSEMBLY } from "../../constants";
 import { OPCODES } from "./constants";
 
 export class MyVM {
-  pc: number = 0;
+  pc: number;
   stack: number[] = [];
   code: Uint8Array;
-  register: number[] = [];
+  envStack: Array<{ [key: number]: number }> = [];
+  callStack: number[] = [];
 
   constructor(code: Uint8Array) {
     this.code = code;
+    this.pc = this.findStart();
+    this.envStack.push({});
+  }
+
+  findStart(): number {
+    for (let i: number = this.code.length - 1; i >= 0; i--) {
+      if (this.code[i] === OPCODES[ASSEMBLY.RETURN]) {
+        return i + 1;
+      }
+    }
+    return 0;
   }
 
   run() {
     while (this.pc < this.code.length) {
       const opcode: number = this.code[this.pc++];
+
+      // * デバッグ用
+
+      // console.log(this.stack);
+      // console.log(this.envStack);
+      // console.log("pc:", this.pc - 1, " opcode:", opcode.toString(16));
+
+      // * ここまで
 
       switch (opcode) {
         case OPCODES[ASSEMBLY.NUMBER]:
@@ -50,13 +70,13 @@ export class MyVM {
         case OPCODES[ASSEMBLY.ASSIGNMENT]:
           const value: number = this.stack.pop()!;
           const variableId: number = this.readInt16();
-          this.register[variableId] = value!;
+          this.envStack[this.envStack.length - 1][variableId] = value!;
           break;
 
         // TODO:ここの変数命名何とかする（上と被り）
         case OPCODES[ASSEMBLY.REFERENCE]:
           const _variableId: number = this.readInt16();
-          this.stack.push(this.register[_variableId]);
+          this.stack.push(this.envStack[this.envStack.length - 1][_variableId]);
           break;
 
         case OPCODES[ASSEMBLY.JUMP]:
@@ -70,6 +90,28 @@ export class MyVM {
           if (condition === 0) {
             this.pc = _address;
           }
+          break;
+
+        case OPCODES[ASSEMBLY.RETURN]:
+          if (this.callStack.length === 0) {
+            throw new Error("Call stack underflow");
+          }
+          this.envStack.pop();
+          this.pc = this.callStack.pop()!;
+          break;
+
+        case OPCODES[ASSEMBLY.FUNCTION_CALL]:
+          const targetAddress: number = this.readInt16();
+          const argsCount: number = this.readInt16();
+          const newEnv: { [key: number]: number } = {};
+
+          for (let i: number = 0; i < argsCount; i++) {
+            newEnv[i] = this.stack.pop()!;
+          }
+
+          this.envStack.push(newEnv);
+          this.callStack.push(this.pc);
+          this.pc = targetAddress;
           break;
 
         case OPCODES[ASSEMBLY.OUTPUT]:
