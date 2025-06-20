@@ -1,5 +1,8 @@
-// astに関する型定義をまとめたファイル
+/* interface.ts */
 
+/**
+ * astに関する型定義をまとめたもの
+ */
 export type Node =
   | ProgramNode
   | StatementsNode
@@ -15,7 +18,11 @@ export type Node =
   | WhileNode
   | StringNode
   | BreakNode
-  | NextNode;
+  | NextNode
+  | DefNode
+  | ParametersNode
+  | RequiredParameterNode
+  | ReturnNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -103,4 +110,30 @@ interface BreakNode {
 
 interface NextNode {
   type: "next_node";
+}
+
+interface DefNode {
+  type: "def_node";
+  name: string;
+  parameters: ParametersNode;
+  body: StatementsNode;
+}
+
+interface ParametersNode {
+  type: "parameters_node";
+  requireds: RequiredParameterNode[];
+  optionals?: string[];
+  posts?: string[];
+  keywords?: string[];
+}
+
+interface RequiredParameterNode {
+  type: "required_parameter_node";
+  flags?: number;
+  name: string;
+}
+
+interface ReturnNode {
+  type: "return_node";
+  arguments: ArgumentsNode;
 }

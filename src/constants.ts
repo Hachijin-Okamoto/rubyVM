@@ -24,10 +24,18 @@ export const ASSEMBLY = {
   JUMP: "JUMP",
   JUMP_IF_FALSE: "JIF",
 
+  // 関数呼び出し
+  FUNCTION_DEFINITION: "DEF",
+  RETURN: "RET",
+  FUNCTION_CALL: "CALL",
+
   // その他
   OUTPUT: "PUTS",
-  FUNCTION_CALL: "CALL",
   NUMBER: "PUSH_NUM",
   STRING: "PUSH_STR",
   END: "HALT",
+
+  // 高速化用
+  NUMBER1: "PUSH_NUM1",
+  NUMBER2: "PUSH_NUM2",
 } as const;
