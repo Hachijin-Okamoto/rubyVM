@@ -327,10 +327,10 @@ const assembly: string[] = generateAssembly(ast);
 
 // * アセンブリ風コードを見たいときは以下をコメントから戻す
 
-// console.log("<Assembly-like Code>");
-// for (const line of assembly) {
-//   console.log(line);
-// }
+console.log("<Assembly-like Code>");
+for (const line of assembly) {
+  console.log(line);
+}
 
 // * ここまで
 
