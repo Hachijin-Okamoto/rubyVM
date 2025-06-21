@@ -5,13 +5,13 @@ export class MyVM {
   pc: number;
   stack: number[] = [];
   code: Uint8Array;
-  envStack: Array<{ [key: number]: number }> = [];
+  envStack: Array<number[]> = [];
   callStack: number[] = [];
 
   constructor(code: Uint8Array) {
     this.code = code;
     this.pc = this.findStart();
-    this.envStack.push({});
+    this.envStack.push([]);
   }
 
   findStart(): number {
