@@ -22,7 +22,8 @@ export type Node =
   | DefNode
   | ParametersNode
   | RequiredParameterNode
-  | ReturnNode;
+  | ReturnNode
+  | ArrayNode;
 
 interface ProgramNode {
   type: "program_node";
@@ -136,4 +137,10 @@ interface RequiredParameterNode {
 interface ReturnNode {
   type: "return_node";
   arguments: ArgumentsNode;
+}
+
+interface ArrayNode {
+  type: "array_node",
+  flags?: number;
+  elements: Node[];
 }
