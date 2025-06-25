@@ -19,6 +19,9 @@ export const ASSEMBLY = {
   // 変数
   ASSIGNMENT: "STORE",
   REFERENCE: "LOAD",
+  ARRAY_DEFINITION: "ARRAY_NEW",
+  ARRAY_ASSIGNMENT: "ARRAY_SET",
+  ARRAY_REFERRENCE: "ARRAY_GET",
 
   // ジャンプ命令
   JUMP: "JUMP",
@@ -31,6 +34,7 @@ export const ASSEMBLY = {
 
   // その他
   OUTPUT: "PUTS",
+  SHUFFLE: "SHUFFLE",
   NUMBER: "PUSH_NUM",
   STRING: "PUSH_STR",
   END: "HALT",

@@ -95,6 +95,12 @@ function generateAssembly(node: Node): string[] {
           return [...argsCode, ASSEMBLY.OUTPUT];
         case "print":
           return [...argsCode, ASSEMBLY.OUTPUT];
+        case "[]=":
+          return [...receiverCode, ...argsCode, ASSEMBLY.ARRAY_ASSIGNMENT];
+        case "[]":
+          return [...receiverCode, ...argsCode, ASSEMBLY.ARRAY_REFERRENCE];
+        case "shuffle":
+          return [...argsCode, ASSEMBLY.SHUFFLE];
         default:
           return [
             ...receiverCode,
@@ -191,6 +197,12 @@ function generateAssembly(node: Node): string[] {
     case "return_node": {
       const returnValueCode: string[] = generateAssembly(node.arguments);
       return [...returnValueCode, ASSEMBLY.RETURN];
+    }
+
+    case "array_node": {
+      const elementsCode: string[] = node.elements.flatMap((element: Node) => generateAssembly(element));
+      return [...elementsCode, ASSEMBLY.ARRAY_DEFINITION + ` ${node.elements.length}`];
+
     }
     default:
       throw new Error(`Unknown node type:${node.type}`);
@@ -338,8 +350,8 @@ const bytecode: Uint8Array = assemble(assembly);
 
 // * バイトコードを見たいときは以下をコメントから戻す
 
-// console.log("<Byte Code>");
-// console.log(bytecode);
+console.log("<Byte Code>");
+console.log(bytecode);
 
 // * ここまで
 

@@ -3,7 +3,7 @@ import { OPCODES } from "./constants";
 
 export class MyVM {
   pc: number;
-  stack: number[] = [];
+  stack: (number | string | any[])[] = [];
   code: Uint8Array;
   envStack: Array<number[]> = [];
   callStack: number[] = [];
@@ -77,13 +77,13 @@ export class MyVM {
         case OPCODES[ASSEMBLY.LESS_EQUAL]:
         case OPCODES[ASSEMBLY.EQUAL]:
         case OPCODES[ASSEMBLY.NOT_EQUAL]:
-          const __b: number = this.stack.pop()!;
-          const __a: number = this.stack.pop()!;
+          const __b: number = this.stack.pop()! as number;
+          const __a: number = this.stack.pop()! as number;
           this.stack.push(this.calc(__a, __b, opcode));
           break;
 
         case OPCODES[ASSEMBLY.ASSIGNMENT]:
-          const value: number = this.stack.pop()!;
+          const value: number = this.stack.pop()! as number;
           const variableId: number = this.readInt16();
           this.envStack[this.envStack.length - 1][variableId] = value!;
           break;
@@ -101,7 +101,7 @@ export class MyVM {
 
         case OPCODES[ASSEMBLY.JUMP_IF_FALSE]:
           const _address: number = this.readInt16();
-          const condition: number = this.stack.pop()!;
+          const condition: number = this.stack.pop()! as number;
           if (condition === 0) {
             this.pc = _address;
           }
@@ -131,7 +131,7 @@ export class MyVM {
           const newEnv: number[] = [];
 
           for (let i: number = argsCount - 1; i >= 0; i--) {
-            newEnv[i] = this.stack.pop()!;
+            newEnv[i] = this.stack.pop()! as number;
           }
 
           this.envStack.push(newEnv);
@@ -143,6 +143,38 @@ export class MyVM {
 
         case OPCODES[ASSEMBLY.OUTPUT]:
           console.log(this.stack.pop());
+          break;
+        
+        case OPCODES[ASSEMBLY.ARRAY_DEFINITION]:
+          const length: number = this.readInt16();
+          const newArray: any[] = [];
+          for (let i = 0; i < length; i++) {
+              newArray.unshift(this.stack.pop());
+          }
+          this.stack.push(newArray);
+          break;
+        
+        case OPCODES[ASSEMBLY.ARRAY_ASSIGNMENT]:
+          const valueSet: number | string = this.stack.pop()! as number | string;
+          const indexSet: number = this.stack.pop()! as number;
+          const targetArraySet: any[] = this.stack.pop()! as any[];
+          targetArraySet[indexSet] = valueSet;
+          break;
+
+        case OPCODES[ASSEMBLY.ARRAY_REFERRENCE]:
+          const indexGet: number = this.stack.pop()! as number;
+          const targetArrayGet: any[] = this.stack.pop()! as any[];
+          this.stack.push(targetArrayGet[indexGet]);
+          break;
+
+        case OPCODES[ASSEMBLY.SHUFFLE]:
+          const targetArrayShuffle: any[] = this.stack.pop()! as any[];
+          const _newArray: any[] = [...targetArrayShuffle];
+          for (let i = _newArray.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [_newArray[i], _newArray[j]] = [_newArray[j], _newArray[i]];
+          }
+          this.stack.push(_newArray);
           break;
 
         case OPCODES[ASSEMBLY.END]:
