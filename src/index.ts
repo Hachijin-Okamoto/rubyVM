@@ -35,12 +35,6 @@ function generateAssembly(node: Node): string[] {
       return node.body.flatMap(generateAssembly);
 
     case "integer_node":
-      // 高速化
-      if (node.value === 1) {
-        return [ASSEMBLY.NUMBER1];
-      } else if (node.value === 2) {
-        return [ASSEMBLY.NUMBER2];
-      }
       return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {

@@ -38,8 +38,4 @@ export const ASSEMBLY = {
   NUMBER: "PUSH_NUM",
   STRING: "PUSH_STR",
   END: "HALT",
-
-  // 高速化用
-  NUMBER1: "PUSH_NUM1",
-  NUMBER2: "PUSH_NUM2",
 } as const;

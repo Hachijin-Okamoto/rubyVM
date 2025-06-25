@@ -40,16 +40,7 @@ export class MyVM {
           const val: number = this.readInt16();
           this.stack.push(val);
           break;
-
-        // 高速化用
-        case OPCODES[ASSEMBLY.NUMBER1]:
-          this.stack.push(1);
-          break;
-
-        case OPCODES[ASSEMBLY.NUMBER2]:
-          this.stack.push(2);
-          break;
-
+          
         case OPCODES[ASSEMBLY.STRING]: {
           const len: number = this.readInt16();
           const strBytes: Uint8Array = this.code.slice(this.pc, this.pc + len);
