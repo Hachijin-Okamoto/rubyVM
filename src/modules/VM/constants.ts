@@ -17,7 +17,6 @@ export const OPCODES: Record<string, number> = {
   [ASSEMBLY.REFERENCE]: 0x0e,
   [ASSEMBLY.JUMP]: 0x0f,
   [ASSEMBLY.JUMP_IF_FALSE]: 0x10,
-  [ASSEMBLY.FUNCTION_DEFINITION]: 0x11, // 使ってないかも?
   [ASSEMBLY.RETURN]: 0x12,
   [ASSEMBLY.FUNCTION_CALL]: 0x13,
   [ASSEMBLY.NUMBER]: 0x14,
@@ -28,8 +27,4 @@ export const OPCODES: Record<string, number> = {
   [ASSEMBLY.ARRAY_REFERRENCE]: 0x19,
   [ASSEMBLY.SHUFFLE]: 0x1a,
   [ASSEMBLY.END]: 0xff,
-
-  // 高速化用
-  [ASSEMBLY.NUMBER1]: 0xa1,
-  [ASSEMBLY.NUMBER2]: 0xa2,
 } as const;

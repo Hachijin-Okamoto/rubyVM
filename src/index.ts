@@ -1,8 +1,4 @@
 /* index.ts */
-
-/**
- * エントリポイント
- */
 import fs from "fs";
 import { Node } from "./modules/ast/interface";
 import path from "path";
@@ -39,12 +35,6 @@ function generateAssembly(node: Node): string[] {
       return node.body.flatMap(generateAssembly);
 
     case "integer_node":
-      // 高速化
-      if (node.value === 1) {
-        return [ASSEMBLY.NUMBER1];
-      } else if (node.value === 2) {
-        return [ASSEMBLY.NUMBER2];
-      }
       return [ASSEMBLY.NUMBER + ` ${node.value}`];
 
     case "call_node": {
@@ -339,10 +329,10 @@ const assembly: string[] = generateAssembly(ast);
 
 // * アセンブリ風コードを見たいときは以下をコメントから戻す
 
-console.log("<Assembly-like Code>");
-for (const line of assembly) {
-  console.log(line);
-}
+// console.log("<Assembly-like Code>");
+// for (const line of assembly) {
+//   console.log(line);
+// }
 
 // * ここまで
 
@@ -350,16 +340,11 @@ const bytecode: Uint8Array = assemble(assembly);
 
 // * バイトコードを見たいときは以下をコメントから戻す
 
-console.log("<Byte Code>");
-console.log(bytecode);
+// console.log("<Byte Code>");
+// console.log(bytecode);
 
 // * ここまで
 
 const VM: MyVM = new MyVM(bytecode);
 console.log("<Standard Output>");
-
-const startTime: number = Date.now();
 VM.run();
-const endTime: number = Date.now();
-
-console.log(`${endTime - startTime}ms`);
